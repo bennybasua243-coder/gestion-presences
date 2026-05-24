@@ -1,0 +1,524 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tableau de bord — Présences</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4ff;
+      color: #222;
+    }
+
+    /* EN-TÊTE */
+    header {
+      background: #1a3c6e;
+      color: white;
+      padding: 18px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 4px solid #c9a84c;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    header h1 { font-size: 1.2rem; }
+    header p  { font-size: 0.8rem; opacity: 0.7; }
+
+    header a {
+      color: #c9a84c;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.88rem;
+    }
+
+    /* CONTENU */
+    .contenu {
+      max-width: 1100px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    /* STATISTIQUES */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat {
+      background: white;
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .stat .nombre {
+      font-size: 2rem;
+      font-weight: 900;
+      color: #1a3c6e;
+      display: block;
+    }
+
+    .stat .libelle {
+      font-size: 0.78rem;
+      color: #888;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .stat.or    .nombre { color: #c9a84c; }
+    .stat.vert  .nombre { color: #1a7a34; }
+
+    /* ONGLETS PROMOTIONS */
+    .onglets {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .onglet {
+      padding: 7px 16px;
+      border: 2px solid #ddd;
+      border-radius: 99px;
+      background: white;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .onglet:hover { border-color: #1a3c6e; color: #1a3c6e; }
+    .onglet.actif { background: #1a3c6e; border-color: #1a3c6e; color: white; }
+
+    /* FILTRES */
+    .filtres {
+      background: white;
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: flex-end;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .filtre-item label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: bold;
+      color: #1a3c6e;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .filtre-item input,
+    .filtre-item select {
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      min-width: 160px;
+    }
+
+    .filtre-item input:focus,
+    .filtre-item select:focus {
+      outline: none;
+      border-color: #1a3c6e;
+    }
+
+    /* BOUTONS */
+    .btn {
+      padding: 9px 18px;
+      border: none;
+      border-radius: 7px;
+      font-size: 0.88rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-bleu  { background: #1a3c6e; color: white; }
+    .btn-or    { background: #c9a84c; color: white; }
+    .btn-rouge { background: #c0392b; color: white; }
+    .btn-gris  { background: #e0e0e0; color: #333; }
+
+    .btn:hover { opacity: 0.88; }
+
+    /* TABLEAU */
+    .section-tableau {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    .entete-tableau {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #eee;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .entete-tableau h2 { font-size: 1rem; color: #1a3c6e; }
+    .entete-tableau .boutons { display: flex; gap: 8px; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      background: #1a3c6e;
+      color: white;
+    }
+
+    thead th {
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.1s;
+    }
+
+    tbody tr:hover { background: #f5f8ff; }
+
+    tbody td {
+      padding: 10px 14px;
+      font-size: 0.88rem;
+    }
+
+    .matricule-tag {
+      background: #eef2ff;
+      color: #1a3c6e;
+      font-family: monospace;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+
+    .badge-promo {
+      background: #dce8fa;
+      color: #1a3c6e;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    /* VIDE */
+    .vide {
+      text-align: center;
+      padding: 50px;
+      color: #bbb;
+      font-style: italic;
+    }
+
+    /* COMPTEUR */
+    .compteur {
+      font-size: 0.83rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+
+<!-- EN-TÊTE -->
+<header>
+  <div>
+    <h1>🎓 GestionPrésences</h1>
+    <p>Tableau de bord — Professeur / Direction</p>
+  </div>
+  <a href="qr-code.html">📷 Générer un QR Code</a>
+</header>
+
+<div class="contenu">
+
+  <!-- STATISTIQUES -->
+  <div class="stats">
+    <div class="stat">
+      <span class="nombre" id="stat-total">0</span>
+      <div class="libelle">Total présences</div>
+    </div>
+    <div class="stat or">
+      <span class="nombre" id="stat-aujourd-hui">0</span>
+      <div class="libelle">Aujourd'hui</div>
+    </div>
+    <div class="stat vert">
+      <span class="nombre" id="stat-promos">0</span>
+      <div class="libelle">Promotions</div>
+    </div>
+  </div>
+
+  <!-- ONGLETS PROMOTIONS -->
+  <div class="onglets" id="onglets"></div>
+
+  <!-- FILTRES -->
+  <div class="filtres">
+    <div class="filtre-item">
+      <label>Date</label>
+      <input type="date" id="f-date" onchange="afficherTableau()"/>
+    </div>
+    <div class="filtre-item">
+      <label>Matière</label>
+      <select id="f-matiere" onchange="afficherTableau()">
+        <option value="">Toutes</option>
+      </select>
+    </div>
+    <div class="filtre-item">
+      <label>Recherche</label>
+      <input type="text" id="f-recherche" placeholder="Nom ou matricule..."
+             oninput="afficherTableau()"/>
+    </div>
+    <div class="filtre-item">
+      <button class="btn btn-gris" onclick="reinitialiserFiltres()">🔄 Réinitialiser</button>
+    </div>
+  </div>
+
+  <!-- TABLEAU -->
+  <div class="section-tableau">
+    <div class="entete-tableau">
+      <h2 id="titre-tableau">Toutes les présences</h2>
+      <div class="boutons">
+        <span class="compteur" id="compteur"></span>
+        &nbsp;
+        <button class="btn btn-or" onclick="exporterCSV()">📊 Exporter CSV</button>
+        <button class="btn btn-rouge" onclick="toutEffacer()">🗑 Tout effacer</button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Matricule</th>
+          <th>Nom</th>
+          <th>Prénoms</th>
+          <th>Poste</th>
+          <th>Promotion</th>
+          <th>Matière</th>
+          <th>Date</th>
+          <th>Heure</th>
+          <th>Supprimer</th>
+        </tr>
+      </thead>
+      <tbody id="corps"></tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  var promoActive = ''; // promotion sélectionnée dans les onglets
+
+  // Au chargement
+  window.onload = function() {
+    // Pré-remplir la date d'aujourd'hui
+    var aujourd = new Date().toISOString().split('T')[0];
+    document.getElementById('f-date').value = aujourd;
+
+    mettreAJourStats();
+    construireOnglets();
+    remplirFiltreMatiere();
+    afficherTableau();
+  };
+
+  // Récupérer toutes les présences
+  function toutesPresences() {
+    return JSON.parse(localStorage.getItem('presences') || '[]');
+  }
+
+  // Mettre à jour les 3 statistiques
+  function mettreAJourStats() {
+    var presences  = toutesPresences();
+    var aujourd    = new Date().toISOString().split('T')[0];
+
+    // Inverser le format AAAA-MM-JJ → déjà bon pour comparer
+    var total      = presences.length;
+    var aujourdhui = presences.filter(function(p) { return p.date === aujourd; }).length;
+    var promos     = new Set(presences.map(function(p) { return p.promotion; })).size;
+
+    document.getElementById('stat-total').textContent      = total;
+    document.getElementById('stat-aujourd-hui').textContent = aujourdhui;
+    document.getElementById('stat-promos').textContent     = promos;
+  }
+
+  // Créer les onglets de promotions
+  function construireOnglets() {
+    var presences = toutesPresences();
+    var promos    = [...new Set(presences.map(function(p) { return p.promotion; }))].sort();
+
+    var html = '<button class="onglet ' + (promoActive === '' ? 'actif' : '') +
+               '" onclick="changerPromo(\'\')">Toutes</button>';
+
+    promos.forEach(function(p) {
+      html += '<button class="onglet ' + (promoActive === p ? 'actif' : '') +
+              '" onclick="changerPromo(\'' + p + '\')">' + p + '</button>';
+    });
+
+    document.getElementById('onglets').innerHTML = html;
+  }
+
+  // Changer la promotion active
+  function changerPromo(promo) {
+    promoActive = promo;
+    construireOnglets();
+    afficherTableau();
+  }
+
+  // Remplir le filtre matière
+  function remplirFiltreMatiere() {
+    var presences = toutesPresences();
+    var matieres  = [...new Set(presences.map(function(p) { return p.matiere; }))].sort();
+    var sel       = document.getElementById('f-matiere');
+
+    // Garder la première option "Toutes"
+    sel.innerHTML = '<option value="">Toutes</option>';
+
+    matieres.forEach(function(m) {
+      sel.innerHTML += '<option value="' + m + '">' + m + '</option>';
+    });
+  }
+
+  // Afficher le tableau selon les filtres
+  function afficherTableau() {
+    var date      = document.getElementById('f-date').value;
+    var matiere   = document.getElementById('f-matiere').value;
+    var recherche = document.getElementById('f-recherche').value.toLowerCase().trim();
+
+    var presences = toutesPresences();
+
+    // Appliquer les filtres
+    if (promoActive) presences = presences.filter(function(p) { return p.promotion === promoActive; });
+    if (date)        presences = presences.filter(function(p) { return p.date === date; });
+    if (matiere)     presences = presences.filter(function(p) { return p.matiere === matiere; });
+    if (recherche)   presences = presences.filter(function(p) {
+      return p.nom.toLowerCase().includes(recherche) ||
+             p.prenoms.toLowerCase().includes(recherche) ||
+             p.matricule.toLowerCase().includes(recherche);
+    });
+
+    // Trier par date décroissante puis nom
+    presences.sort(function(a, b) {
+      if (b.date !== a.date) return b.date.localeCompare(a.date);
+      return a.nom.localeCompare(b.nom);
+    });
+
+    // Titre du tableau
+    document.getElementById('titre-tableau').textContent =
+      promoActive ? 'Présences — ' + promoActive : 'Toutes les présences';
+    document.getElementById('compteur').textContent =
+      presences.length + ' résultat(s)';
+
+    // Remplir le tableau
+    var corps = document.getElementById('corps');
+
+    if (presences.length === 0) {
+      corps.innerHTML = '<tr><td colspan="10" class="vide">Aucune présence trouvée.</td></tr>';
+      return;
+    }
+
+    corps.innerHTML = presences.map(function(p, i) {
+      // Formater la date JJ/MM/AAAA
+      var parts = p.date.split('-');
+      var dateAff = parts[2] + '/' + parts[1] + '/' + parts[0];
+
+      return '<tr>' +
+        '<td>' + (i + 1) + '</td>' +
+        '<td><span class="matricule-tag">' + p.matricule + '</span></td>' +
+        '<td><strong>' + p.nom + '</strong></td>' +
+        '<td>' + p.prenoms + '</td>' +
+        '<td>' + (p.poste || '—') + '</td>' +
+        '<td><span class="badge-promo">' + p.promotion + '</span></td>' +
+        '<td>' + p.matiere + '</td>' +
+        '<td>' + dateAff + '</td>' +
+        '<td>' + p.heure + '</td>' +
+        '<td><button class="btn btn-rouge" style="padding:4px 10px;font-size:0.75rem;" ' +
+            'onclick="supprimer(\'' + p.cleUnique + '\')">🗑</button></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // Supprimer une présence
+  function supprimer(cleUnique) {
+    if (!confirm('Supprimer cette présence ?')) return;
+
+    var presences = toutesPresences().filter(function(p) {
+      return p.cleUnique !== cleUnique;
+    });
+
+    localStorage.setItem('presences', JSON.stringify(presences));
+    mettreAJourStats();
+    construireOnglets();
+    remplirFiltreMatiere();
+    afficherTableau();
+  }
+
+  // Tout effacer
+  function toutEffacer() {
+    if (!confirm('Effacer TOUTES les présences ? Cette action est irréversible.')) return;
+    localStorage.removeItem('presences');
+    mettreAJourStats();
+    construireOnglets();
+    remplirFiltreMatiere();
+    afficherTableau();
+  }
+
+  // Réinitialiser les filtres
+  function reinitialiserFiltres() {
+    var aujourd = new Date().toISOString().split('T')[0];
+    document.getElementById('f-date').value     = aujourd;
+    document.getElementById('f-matiere').value  = '';
+    document.getElementById('f-recherche').value = '';
+    promoActive = '';
+    construireOnglets();
+    afficherTableau();
+  }
+
+  // Exporter en CSV (compatible Excel)
+  function exporterCSV() {
+    var presences = toutesPresences();
+    if (presences.length === 0) { alert('Aucune donnée à exporter.'); return; }
+
+    var entetes = ['Matricule', 'Nom', 'Prénoms', 'Poste', 'Promotion', 'Matière', 'Date', 'Heure'];
+
+    var lignes = presences.map(function(p) {
+      var parts   = p.date.split('-');
+      var dateAff = parts[2] + '/' + parts[1] + '/' + parts[0];
+      return [p.matricule, p.nom, p.prenoms, p.poste, p.promotion,
+              p.matiere, dateAff, p.heure]
+        .map(function(v) { return '"' + (v || '').replace(/"/g, '""') + '"'; })
+        .join(',');
+    });
+
+    var csv  = '\uFEFF' + entetes.join(',') + '\n' + lignes.join('\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href   = url;
+    a.download = 'presences_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+</script>
+
+</body>
+</html>

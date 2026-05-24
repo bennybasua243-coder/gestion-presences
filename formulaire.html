@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feuille de Présence</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1a3c6e;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      margin: 0;
+    }
+
+    .carte {
+      background: white;
+      border-radius: 16px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 460px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    }
+
+    /* Bande colorée en haut */
+    .bande {
+      height: 5px;
+      background: linear-gradient(90deg, #1a3c6e, #c9a84c);
+      border-radius: 5px;
+      margin-bottom: 24px;
+    }
+
+    .entete {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .entete .emoji {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .entete h1 {
+      font-size: 1.4rem;
+      color: #1a3c6e;
+      margin-bottom: 4px;
+    }
+
+    /* Bloc d'info du cours (classe + matière + date) */
+    .bloc-cours {
+      background: #eef2ff;
+      border-left: 4px solid #1a3c6e;
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .bloc-cours strong {
+      display: block;
+      font-size: 1rem;
+      color: #1a3c6e;
+      margin-bottom: 4px;
+    }
+
+    /* Champs du formulaire */
+    .champ {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: bold;
+      color: #1a3c6e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      box-sizing: border-box;
+      color: #222;
+      background: #fafafa;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1a3c6e;
+      background: white;
+    }
+
+    input.rouge { border-color: #c0392b; }
+
+    .msg-erreur {
+      color: #c0392b;
+      font-size: 0.78rem;
+      margin-top: 3px;
+      display: none;
+    }
+
+    /* Bouton envoyer */
+    .btn-envoyer {
+      width: 100%;
+      padding: 13px;
+      background: #1a3c6e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .btn-envoyer:hover {
+      background: #0d2145;
+    }
+
+    /* Écrans alternatifs */
+    #ecran-succes, #ecran-deja, #ecran-erreur-url {
+      display: none;
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .grand-emoji {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    #ecran-succes h2  { color: #1a7a34; margin-bottom: 10px; }
+    #ecran-deja h2    { color: #e67e22; margin-bottom: 10px; }
+    #ecran-erreur-url h2 { color: #c0392b; margin-bottom: 10px; }
+
+    .resume {
+      background: #f0faf4;
+      border-radius: 10px;
+      padding: 14px;
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.9;
+      margin: 14px 0;
+    }
+
+    .resume-deja {
+      background: #fff8f0;
+    }
+
+    p.note {
+      color: #999;
+      font-size: 0.82rem;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="carte">
+  <div class="bande"></div>
+
+  <!-- ===== FORMULAIRE ===== -->
+  <div id="ecran-formulaire">
+
+    <div class="entete">
+      <span class="emoji">📋</span>
+      <h1>Feuille de Présence</h1>
+    </div>
+
+    <!-- Info du cours : remplie automatiquement depuis le QR -->
+    <div class="bloc-cours">
+      <strong id="titre-cours">Chargement...</strong>
+      <span id="info-classe"></span> &nbsp;|&nbsp;
+      <span id="info-date"></span>
+    </div>
+
+    <!-- Matricule -->
+    <div class="champ">
+      <label>Matricule *</label>
+      <input type="text" id="matricule" placeholder="Ex: ETU2024001"
+             oninput="this.value = this.value.toUpperCase()"/>
+      <div class="msg-erreur" id="err-matricule">Le matricule est obligatoire.</div>
+    </div>
+
+    <!-- Nom -->
+    <div class="champ">
+      <label>Nom *</label>
+      <input type="text" id="nom" placeholder="Votre nom de famille"/>
+      <div class="msg-erreur" id="err-nom">Le nom est obligatoire.</div>
+    </div>
+
+    <!-- Prénoms -->
+    <div class="champ">
+      <label>Prénoms *</label>
+      <input type="text" id="prenoms" placeholder="Vos prénoms"/>
+      <div class="msg-erreur" id="err-prenoms">Les prénoms sont obligatoires.</div>
+    </div>
+
+    <!-- Promotion -->
+    <div class="champ">
+      <label>Promotion *</label>
+      <select id="promotion">
+        <option value="">— Choisir —</option>
+        <option value="L1">Licence 1 (L1)</option>
+        <option value="L2">Licence 2 (L2)</option>
+        <option value="L3">Licence 3 (L3)</option>
+        <option value="M1">Master 1 (M1)</option>
+        <option value="M2">Master 2 (M2)</option>
+        <option value="BTS1">BTS 1ère année</option>
+        <option value="BTS2">BTS 2ème année</option>
+        <option value="DUT1">DUT 1ère année</option>
+        <option value="DUT2">DUT 2ème année</option>
+      </select>
+      <div class="msg-erreur" id="err-promotion">Choisissez votre promotion.</div>
+    </div>
+
+    <!-- Poste -->
+    <div class="champ">
+      <label>Poste <small style="font-weight:normal;text-transform:none">(optionnel)</small></label>
+      <input type="text" id="poste" placeholder="Ex: Délégué, Étudiant..."/>
+    </div>
+
+    <button class="btn-envoyer" onclick="envoyer()">
+      ✅ Enregistrer ma présence
+    </button>
+  </div>
+
+  <!-- ===== SUCCÈS ===== -->
+  <div id="ecran-succes">
+    <span class="grand-emoji">🎉</span>
+    <h2>Présence enregistrée !</h2>
+    <p>Votre présence a bien été enregistrée.</p>
+    <div class="resume" id="contenu-resume"></div>
+    <p class="note">Vous pouvez fermer cette page.</p>
+  </div>
+
+  <!-- ===== DÉJÀ ENREGISTRÉ ===== -->
+  <div id="ecran-deja">
+    <span class="grand-emoji">⚠️</span>
+    <h2>Déjà enregistré !</h2>
+    <p>Votre présence pour <strong>aujourd'hui</strong> a déjà été enregistrée.</p>
+    <div class="resume resume-deja" id="contenu-deja"></div>
+    <p class="note">Un seul enregistrement par jour est autorisé.</p>
+  </div>
+
+  <!-- ===== QR INVALIDE ===== -->
+  <div id="ecran-erreur-url">
+    <span class="grand-emoji">❌</span>
+    <h2>Lien invalide</h2>
+    <p>Ce lien ne vient pas d'un QR code valide.<br/>
+       Demandez à votre professeur le bon QR code.</p>
+  </div>
+
+</div>
+
+<script>
+  // Variables globales
+  var classe  = '';
+  var matiere = '';
+  var dateAujourdhui = '';
+
+  // Au chargement de la page
+  window.onload = function() {
+    // Lire les paramètres dans l'URL (envoyés par le QR code)
+    var params = new URLSearchParams(window.location.search);
+    classe  = params.get('classe')  || '';
+    matiere = params.get('matiere') || '';
+
+    // Si paramètres manquants : QR invalide
+    if (!classe || !matiere) {
+      afficher('erreur-url');
+      return;
+    }
+
+    // Date d'aujourd'hui au format JJ/MM/AAAA
+    var maintenant = new Date();
+    var j  = String(maintenant.getDate()).padStart(2, '0');
+    var m  = String(maintenant.getMonth() + 1).padStart(2, '0');
+    var a  = maintenant.getFullYear();
+    dateAujourdhui = a + '-' + m + '-' + j; // format stockage : AAAA-MM-JJ
+    var dateAffichage = j + '/' + m + '/' + a;
+
+    // Afficher les infos du cours
+    document.getElementById('titre-cours').textContent = '📚 ' + matiere;
+    document.getElementById('info-classe').textContent = '🎓 ' + classe;
+    document.getElementById('info-date').textContent   = '📅 ' + dateAffichage;
+  };
+
+  // Afficher un écran particulier
+  function afficher(nom) {
+    document.getElementById('ecran-formulaire').style.display  = nom === 'formulaire'  ? 'block' : 'none';
+    document.getElementById('ecran-succes').style.display      = nom === 'succes'      ? 'block' : 'none';
+    document.getElementById('ecran-deja').style.display        = nom === 'deja'        ? 'block' : 'none';
+    document.getElementById('ecran-erreur-url').style.display  = nom === 'erreur-url'  ? 'block' : 'none';
+  }
+
+  // Valider un champ et afficher/cacher l'erreur
+  function valider(id, idErr, condition) {
+    var champ = document.getElementById(id);
+    var err   = document.getElementById(idErr);
+    if (!condition) {
+      champ.classList.add('rouge');
+      err.style.display = 'block';
+      return false;
+    }
+    champ.classList.remove('rouge');
+    err.style.display = 'none';
+    return true;
+  }
+
+  // Envoyer le formulaire
+  function envoyer() {
+    var matricule = document.getElementById('matricule').value.trim().toUpperCase();
+    var nom       = document.getElementById('nom').value.trim().toUpperCase();
+    var prenoms   = document.getElementById('prenoms').value.trim();
+    var promotion = document.getElementById('promotion').value;
+    var poste     = document.getElementById('poste').value.trim() || 'Étudiant(e)';
+
+    // Vérifier chaque champ
+    var ok = true;
+    ok = valider('matricule', 'err-matricule', matricule !== '') && ok;
+    ok = valider('nom',       'err-nom',       nom       !== '') && ok;
+    ok = valider('prenoms',   'err-prenoms',   prenoms   !== '') && ok;
+    ok = valider('promotion', 'err-promotion', promotion !== '') && ok;
+
+    if (!ok) return;
+
+    // Charger les présences existantes
+    var presences = JSON.parse(localStorage.getItem('presences') || '[]');
+
+    // Clé unique = matricule + matière + date du jour
+    // Empêche un même étudiant de s'inscrire deux fois le même jour pour le même cours
+    var cleUnique = matricule + '_' + matiere + '_' + dateAujourdhui;
+
+    var dejaLa = presences.find(function(p) {
+      return p.cleUnique === cleUnique;
+    });
+
+    if (dejaLa) {
+      // Déjà enregistré aujourd'hui
+      document.getElementById('contenu-deja').innerHTML =
+        '👤 ' + dejaLa.nom + ' ' + dejaLa.prenoms + '<br/>' +
+        '🪪 ' + dejaLa.matricule + '<br/>' +
+        '🎓 ' + dejaLa.promotion + '<br/>' +
+        '🕐 Enregistré à ' + dejaLa.heure;
+      afficher('deja');
+      return;
+    }
+
+    // Heure actuelle
+    var maintenant = new Date();
+    var heure = maintenant.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+
+    // Créer la présence
+    var presence = {
+      cleUnique:  cleUnique,
+      date:       dateAujourdhui,
+      classe:     classe,
+      matiere:    matiere,
+      matricule:  matricule,
+      nom:        nom,
+      prenoms:    prenoms,
+      promotion:  promotion,
+      poste:      poste,
+      heure:      heure
+    };
+
+    // Sauvegarder
+    presences.push(presence);
+    localStorage.setItem('presences', JSON.stringify(presences));
+
+    // Afficher le succès
+    document.getElementById('contenu-resume').innerHTML =
+      '📛 <strong>Nom :</strong> ' + nom + ' ' + prenoms + '<br/>' +
+      '🪪 <strong>Matricule :</strong> ' + matricule + '<br/>' +
+      '🎓 <strong>Promotion :</strong> ' + promotion + '<br/>' +
+      '📚 <strong>Matière :</strong> ' + matiere + '<br/>' +
+      '🕐 <strong>Heure :</strong> ' + heure;
+
+    afficher('succes');
+  }
+</script>
+
+</body>
+</html>
