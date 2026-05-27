@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -7,312 +6,279 @@
   <title>Tableau de bord — Présences</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; color: #333; }
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4ff;
-      color: #222;
-    }
-
-    /* EN-TÊTE */
-    header {
-      background: #1a3c6e;
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #1a237e, #0d47a1);
       color: white;
-      padding: 18px 28px;
+      padding: 18px 30px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      border-bottom: 4px solid #c9a84c;
+      justify-content: space-between;
       flex-wrap: wrap;
       gap: 10px;
     }
-
-    header h1 { font-size: 1.2rem; }
-    header p  { font-size: 0.8rem; opacity: 0.7; }
-
-    header a {
-      color: #c9a84c;
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header p { font-size: 13px; opacity: 0.8; }
+    .header a {
+      background: rgba(255,255,255,0.2);
+      color: white;
       text-decoration: none;
-      font-weight: bold;
-      font-size: 0.88rem;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      border: 1px solid rgba(255,255,255,0.3);
+      transition: background 0.2s;
     }
+    .header a:hover { background: rgba(255,255,255,0.3); }
 
-    /* CONTENU */
-    .contenu {
-      max-width: 1100px;
-      margin: 30px auto;
-      padding: 0 20px;
-    }
-
-    /* STATISTIQUES */
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .stat {
+    /* STATS */
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 24px 30px 0; }
+    .stat-card {
       background: white;
-      border-radius: 10px;
-      padding: 18px;
+      border-radius: 14px;
+      padding: 22px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      border-top: 4px solid #1a237e;
     }
-
-    .stat .nombre {
-      font-size: 2rem;
-      font-weight: 900;
-      color: #1a3c6e;
-      display: block;
-    }
-
-    .stat .libelle {
-      font-size: 0.78rem;
-      color: #888;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-
-    .stat.or    .nombre { color: #c9a84c; }
-    .stat.vert  .nombre { color: #1a7a34; }
-
-    /* ONGLETS PROMOTIONS */
-    .onglets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-
-    .onglet {
-      padding: 7px 16px;
-      border: 2px solid #ddd;
-      border-radius: 99px;
-      background: white;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: #555;
-    }
-
-    .onglet:hover { border-color: #1a3c6e; color: #1a3c6e; }
-    .onglet.actif { background: #1a3c6e; border-color: #1a3c6e; color: white; }
+    .stat-card.gold { border-top-color: #f9a825; }
+    .stat-card.green { border-top-color: #2e7d32; }
+    .stat-card .number { font-size: 38px; font-weight: 800; color: #1a237e; }
+    .stat-card.gold .number { color: #f9a825; }
+    .stat-card.green .number { color: #2e7d32; }
+    .stat-card .label { font-size: 12px; color: #888; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-top: 4px; }
 
     /* FILTRES */
-    .filtres {
+    .filters {
       background: white;
-      border-radius: 10px;
-      padding: 18px 20px;
-      margin-bottom: 20px;
+      margin: 20px 30px;
+      border-radius: 14px;
+      padding: 20px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
       display: flex;
+      gap: 16px;
       flex-wrap: wrap;
-      gap: 14px;
       align-items: flex-end;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-
-    .filtre-item label {
-      display: block;
-      font-size: 0.78rem;
-      font-weight: bold;
-      color: #1a3c6e;
-      text-transform: uppercase;
-      margin-bottom: 5px;
-    }
-
-    .filtre-item input,
-    .filtre-item select {
-      padding: 8px 12px;
-      border: 2px solid #ddd;
-      border-radius: 7px;
-      font-size: 0.88rem;
+    .filter-group { display: flex; flex-direction: column; gap: 6px; }
+    .filter-group label { font-size: 12px; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+    .filter-group input, .filter-group select {
+      padding: 9px 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
       min-width: 160px;
     }
-
-    .filtre-item input:focus,
-    .filtre-item select:focus {
-      outline: none;
-      border-color: #1a3c6e;
-    }
-
-    /* BOUTONS */
-    .btn {
+    .filter-group input:focus, .filter-group select:focus { border-color: #1a237e; }
+    .btn-reset {
       padding: 9px 18px;
-      border: none;
-      border-radius: 7px;
-      font-size: 0.88rem;
-      font-weight: bold;
+      background: #f0f4f8;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
       cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      transition: all 0.2s;
     }
-
-    .btn-bleu  { background: #1a3c6e; color: white; }
-    .btn-or    { background: #c9a84c; color: white; }
-    .btn-rouge { background: #c0392b; color: white; }
-    .btn-gris  { background: #e0e0e0; color: #333; }
-
-    .btn:hover { opacity: 0.88; }
+    .btn-reset:hover { background: #e0e0e0; }
 
     /* TABLEAU */
-    .section-tableau {
+    .table-section {
+      margin: 0 30px 30px;
       background: white;
-      border-radius: 10px;
+      border-radius: 14px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
-
-    .entete-tableau {
+    .table-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid #eee;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .entete-tableau h2 { font-size: 1rem; color: #1a3c6e; }
-    .entete-tableau .boutons { display: flex; gap: 8px; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    thead tr {
-      background: #1a3c6e;
-      color: white;
-    }
-
-    thead th {
-      padding: 11px 14px;
-      text-align: left;
-      font-size: 0.78rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-
-    tbody tr {
+      justify-content: space-between;
+      padding: 18px 24px;
       border-bottom: 1px solid #f0f0f0;
-      transition: background 0.1s;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .table-header h2 { font-size: 16px; color: #1a237e; font-weight: 700; }
+    .results-count { font-size: 13px; color: #888; }
+    .actions { display: flex; gap: 10px; }
+    .btn-csv {
+      padding: 8px 16px;
+      background: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .btn-delete-all {
+      padding: 8px 16px;
+      background: #c62828;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
     }
 
-    tbody tr:hover { background: #f5f8ff; }
-
-    tbody td {
-      padding: 10px 14px;
-      font-size: 0.88rem;
-    }
-
-    .matricule-tag {
-      background: #eef2ff;
-      color: #1a3c6e;
-      font-family: monospace;
-      font-weight: bold;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-    }
-
-    .badge-promo {
-      background: #dce8fa;
-      color: #1a3c6e;
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #1a237e; color: white; }
+    th { padding: 12px 14px; text-align: left; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid #f5f5f5; }
+    tr:hover td { background: #f8f9ff; }
+    .badge {
+      display: inline-block;
       padding: 3px 10px;
-      border-radius: 99px;
-      font-size: 0.75rem;
-      font-weight: bold;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      background: #e3f2fd;
+      color: #1a237e;
     }
-
-    /* VIDE */
-    .vide {
+    .btn-del {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+    .btn-del:hover { opacity: 1; }
+    .empty-row td {
       text-align: center;
-      padding: 50px;
-      color: #bbb;
+      padding: 40px;
+      color: #aaa;
       font-style: italic;
     }
+    .loading-row td {
+      text-align: center;
+      padding: 30px;
+      color: #1a237e;
+    }
 
-    /* COMPTEUR */
-    .compteur {
-      font-size: 0.83rem;
-      color: #888;
+    /* Indicateur en direct */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .live-dot {
+      width: 8px; height: 8px;
+      background: #2e7d32;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: 1fr; padding: 16px; }
+      .filters { margin: 12px 16px; }
+      .table-section { margin: 0 16px 20px; }
+      .header { padding: 14px 16px; }
     }
   </style>
 </head>
 <body>
 
-<!-- EN-TÊTE -->
-<header>
+<div class="header">
   <div>
-    <h1>🎓 GestionPrésences</h1>
+    <h1>🎓 Gestion des Présences</h1>
     <p>Tableau de bord — Professeur / Direction</p>
   </div>
-  <a href="qr-code.html">📷 Générer un QR Code</a>
-</header>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <span class="live-badge"><span class="live-dot"></span>EN DIRECT</span>
+    <a href="qr-generator.html">📷 Générer un QR Code</a>
+  </div>
+</div>
 
-<div class="contenu">
+<!-- STATISTIQUES -->
+<div class="stats">
+  <div class="stat-card">
+    <div class="number" id="total-count">—</div>
+    <div class="label">Total Présences</div>
+  </div>
+  <div class="stat-card gold">
+    <div class="number" id="today-count">—</div>
+    <div class="label">Aujourd'hui</div>
+  </div>
+  <div class="stat-card green">
+    <div class="number" id="promo-count">—</div>
+    <div class="label">Promotions</div>
+  </div>
+</div>
 
-  <!-- STATISTIQUES -->
-  <div class="stats">
-    <div class="stat">
-      <span class="nombre" id="stat-total">0</span>
-      <div class="libelle">Total présences</div>
+<!-- FILTRES -->
+<div class="filters">
+  <div class="filter-group">
+    <label>Date</label>
+    <input type="date" id="filtre-date"/>
+  </div>
+  <div class="filter-group">
+    <label>Matière</label>
+    <select id="filtre-matiere">
+      <option value="">Toutes</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Promotion</label>
+    <select id="filtre-promotion">
+      <option value="">Toutes</option>
+      <option>Licence 1 (L1)</option>
+      <option>Licence 2 (L2)</option>
+      <option>Licence 3 (L3)</option>
+      <option>Master 1 (M1)</option>
+      <option>Master 2 (M2)</option>
+      <option>BTS 1ère année</option>
+      <option>BTS 2ème année</option>
+      <option>DUT 1ère année</option>
+      <option>DUT 2ème année</option>
+    </select>
+  </div>
+  <div class="filter-group">
+    <label>Recherche</label>
+    <input type="text" id="filtre-recherche" placeholder="Nom, post-nom ou matricule..."/>
+  </div>
+  <button class="btn-reset" onclick="reinitialiser()">🔄 Réinitialiser</button>
+</div>
+
+<!-- TABLEAU -->
+<div class="table-section">
+  <div class="table-header">
+    <div>
+      <h2>Toutes les présences</h2>
+      <div class="results-count" id="results-count">Chargement...</div>
     </div>
-    <div class="stat or">
-      <span class="nombre" id="stat-aujourd-hui">0</span>
-      <div class="libelle">Aujourd'hui</div>
-    </div>
-    <div class="stat vert">
-      <span class="nombre" id="stat-promos">0</span>
-      <div class="libelle">Promotions</div>
+    <div class="actions">
+      <button class="btn-csv" onclick="exporterCSV()">📊 Exporter CSV</button>
+      <button class="btn-delete-all" onclick="toutEffacer()">🗑 Tout effacer</button>
     </div>
   </div>
 
-  <!-- ONGLETS PROMOTIONS -->
-  <div class="onglets" id="onglets"></div>
-
-  <!-- FILTRES -->
-  <div class="filtres">
-    <div class="filtre-item">
-      <label>Date</label>
-      <input type="date" id="f-date" onchange="afficherTableau()"/>
-    </div>
-    <div class="filtre-item">
-      <label>Matière</label>
-      <select id="f-matiere" onchange="afficherTableau()">
-        <option value="">Toutes</option>
-      </select>
-    </div>
-    <div class="filtre-item">
-      <label>Recherche</label>
-      <input type="text" id="f-recherche" placeholder="Nom ou matricule..."
-             oninput="afficherTableau()"/>
-    </div>
-    <div class="filtre-item">
-      <button class="btn btn-gris" onclick="reinitialiserFiltres()">🔄 Réinitialiser</button>
-    </div>
-  </div>
-
-  <!-- TABLEAU -->
-  <div class="section-tableau">
-    <div class="entete-tableau">
-      <h2 id="titre-tableau">Toutes les présences</h2>
-      <div class="boutons">
-        <span class="compteur" id="compteur"></span>
-        &nbsp;
-        <button class="btn btn-or" onclick="exporterCSV()">📊 Exporter CSV</button>
-        <button class="btn btn-rouge" onclick="toutEffacer()">🗑 Tout effacer</button>
-      </div>
-    </div>
-
+  <div style="overflow-x:auto;">
     <table>
       <thead>
         <tr>
           <th>#</th>
           <th>Matricule</th>
           <th>Nom</th>
+          <th>Post-nom</th>
           <th>Prénoms</th>
-          <th>Poste</th>
           <th>Promotion</th>
           <th>Matière</th>
           <th>Date</th>
@@ -320,204 +286,184 @@
           <th>Supprimer</th>
         </tr>
       </thead>
-      <tbody id="corps"></tbody>
+      <tbody id="table-body">
+        <tr class="loading-row"><td colspan="10">⏳ Connexion à la base de données...</td></tr>
+      </tbody>
     </table>
   </div>
-
 </div>
 
-<script>
-  var promoActive = ''; // promotion sélectionnée dans les onglets
+<!-- ======== FIREBASE ======== -->
+<script type="module">
+  // ================================================================
+  // 🔥 METS ICI TA CONFIGURATION FIREBASE (même que formulaire.html)
+  // ================================================================
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, deleteDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // Au chargement
-  window.onload = function() {
-    // Pré-remplir la date d'aujourd'hui
-    var aujourd = new Date().toISOString().split('T')[0];
-    document.getElementById('f-date').value = aujourd;
-
-    mettreAJourStats();
-    construireOnglets();
-    remplirFiltreMatiere();
-    afficherTableau();
+  const firebaseConfig = {
+    apiKey: "METS-TON-API-KEY-ICI",
+    authDomain: "METS-TON-AUTH-DOMAIN-ICI",
+    projectId: "METS-TON-PROJECT-ID-ICI",
+    storageBucket: "METS-TON-STORAGE-BUCKET-ICI",
+    messagingSenderId: "METS-TON-SENDER-ID-ICI",
+    appId: "METS-TON-APP-ID-ICI"
   };
+  // ================================================================
 
-  // Récupérer toutes les présences
-  function toutesPresences() {
-    return JSON.parse(localStorage.getItem('presences') || '[]');
-  }
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-  // Mettre à jour les 3 statistiques
-  function mettreAJourStats() {
-    var presences  = toutesPresences();
-    var aujourd    = new Date().toISOString().split('T')[0];
+  let toutesLesPresences = []; // stockage local
+  let presencesAfichees = [];
 
-    // Inverser le format AAAA-MM-JJ → déjà bon pour comparer
-    var total      = presences.length;
-    var aujourdhui = presences.filter(function(p) { return p.date === aujourd; }).length;
-    var promos     = new Set(presences.map(function(p) { return p.promotion; })).size;
+  // Date du jour au format JJ/MM/AAAA
+  const aujourd_hui = new Date().toLocaleDateString('fr-FR');
+  // Date au format YYYY-MM-DD pour l'input date
+  const maintenant = new Date();
+  const dateInput = maintenant.toISOString().split('T')[0];
+  document.getElementById('filtre-date').value = dateInput;
 
-    document.getElementById('stat-total').textContent      = total;
-    document.getElementById('stat-aujourd-hui').textContent = aujourdhui;
-    document.getElementById('stat-promos').textContent     = promos;
-  }
-
-  // Créer les onglets de promotions
-  function construireOnglets() {
-    var presences = toutesPresences();
-    var promos    = [...new Set(presences.map(function(p) { return p.promotion; }))].sort();
-
-    var html = '<button class="onglet ' + (promoActive === '' ? 'actif' : '') +
-               '" onclick="changerPromo(\'\')">Toutes</button>';
-
-    promos.forEach(function(p) {
-      html += '<button class="onglet ' + (promoActive === p ? 'actif' : '') +
-              '" onclick="changerPromo(\'' + p + '\')">' + p + '</button>';
+  // ---- Écoute temps réel Firebase ----
+  onSnapshot(collection(db, "presences"), (snapshot) => {
+    toutesLesPresences = [];
+    snapshot.forEach(docSnap => {
+      toutesLesPresences.push({ id: docSnap.id, ...docSnap.data() });
     });
 
-    document.getElementById('onglets').innerHTML = html;
-  }
+    // Trier par timestamp décroissant
+    toutesLesPresences.sort((a, b) => {
+      if (a.timestamp && b.timestamp) return b.timestamp.localeCompare(a.timestamp);
+      return 0;
+    });
 
-  // Changer la promotion active
-  function changerPromo(promo) {
-    promoActive = promo;
-    construireOnglets();
+    mettreAJourMatieres();
     afficherTableau();
-  }
+    mettreAJourStats();
+  });
 
-  // Remplir le filtre matière
-  function remplirFiltreMatiere() {
-    var presences = toutesPresences();
-    var matieres  = [...new Set(presences.map(function(p) { return p.matiere; }))].sort();
-    var sel       = document.getElementById('f-matiere');
-
-    // Garder la première option "Toutes"
+  // ---- Mise à jour des matières dans le filtre ----
+  function mettreAJourMatieres() {
+    const sel = document.getElementById('filtre-matiere');
+    const actuelle = sel.value;
+    const matieres = [...new Set(toutesLesPresences.map(p => p.matiere).filter(Boolean))];
     sel.innerHTML = '<option value="">Toutes</option>';
-
-    matieres.forEach(function(m) {
-      sel.innerHTML += '<option value="' + m + '">' + m + '</option>';
+    matieres.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      if (m === actuelle) opt.selected = true;
+      sel.appendChild(opt);
     });
   }
 
-  // Afficher le tableau selon les filtres
+  // ---- Afficher le tableau avec filtres ----
   function afficherTableau() {
-    var date      = document.getElementById('f-date').value;
-    var matiere   = document.getElementById('f-matiere').value;
-    var recherche = document.getElementById('f-recherche').value.toLowerCase().trim();
+    const dateVal = document.getElementById('filtre-date').value;
+    const matiereVal = document.getElementById('filtre-matiere').value.toLowerCase();
+    const promoVal = document.getElementById('filtre-promotion').value.toLowerCase();
+    const rechercheVal = document.getElementById('filtre-recherche').value.toLowerCase();
 
-    var presences = toutesPresences();
+    // Convertir date input (YYYY-MM-DD) en format affiché (JJ/MM/AAAA) pour comparer
+    let dateFr = '';
+    if (dateVal) {
+      const [y, m, d] = dateVal.split('-');
+      dateFr = `${d}/${m}/${y}`;
+    }
 
-    // Appliquer les filtres
-    if (promoActive) presences = presences.filter(function(p) { return p.promotion === promoActive; });
-    if (date)        presences = presences.filter(function(p) { return p.date === date; });
-    if (matiere)     presences = presences.filter(function(p) { return p.matiere === matiere; });
-    if (recherche)   presences = presences.filter(function(p) {
-      return p.nom.toLowerCase().includes(recherche) ||
-             p.prenoms.toLowerCase().includes(recherche) ||
-             p.matricule.toLowerCase().includes(recherche);
+    presencesAfichees = toutesLesPresences.filter(p => {
+      if (dateFr && p.date !== dateFr) return false;
+      if (matiereVal && (p.matiere || '').toLowerCase() !== matiereVal) return false;
+      if (promoVal && (p.promotion || '').toLowerCase() !== promoVal) return false;
+      if (rechercheVal) {
+        const texte = `${p.nom} ${p.postnom} ${p.prenoms} ${p.matricule}`.toLowerCase();
+        if (!texte.includes(rechercheVal)) return false;
+      }
+      return true;
     });
 
-    // Trier par date décroissante puis nom
-    presences.sort(function(a, b) {
-      if (b.date !== a.date) return b.date.localeCompare(a.date);
-      return a.nom.localeCompare(b.nom);
-    });
+    const tbody = document.getElementById('table-body');
+    document.getElementById('results-count').textContent = `${presencesAfichees.length} résultat(s)`;
 
-    // Titre du tableau
-    document.getElementById('titre-tableau').textContent =
-      promoActive ? 'Présences — ' + promoActive : 'Toutes les présences';
-    document.getElementById('compteur').textContent =
-      presences.length + ' résultat(s)';
-
-    // Remplir le tableau
-    var corps = document.getElementById('corps');
-
-    if (presences.length === 0) {
-      corps.innerHTML = '<tr><td colspan="10" class="vide">Aucune présence trouvée.</td></tr>';
+    if (presencesAfichees.length === 0) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="10">Aucune présence trouvée</td></tr>';
       return;
     }
 
-    corps.innerHTML = presences.map(function(p, i) {
-      // Formater la date JJ/MM/AAAA
-      var parts = p.date.split('-');
-      var dateAff = parts[2] + '/' + parts[1] + '/' + parts[0];
-
-      return '<tr>' +
-        '<td>' + (i + 1) + '</td>' +
-        '<td><span class="matricule-tag">' + p.matricule + '</span></td>' +
-        '<td><strong>' + p.nom + '</strong></td>' +
-        '<td>' + p.prenoms + '</td>' +
-        '<td>' + (p.poste || '—') + '</td>' +
-        '<td><span class="badge-promo">' + p.promotion + '</span></td>' +
-        '<td>' + p.matiere + '</td>' +
-        '<td>' + dateAff + '</td>' +
-        '<td>' + p.heure + '</td>' +
-        '<td><button class="btn btn-rouge" style="padding:4px 10px;font-size:0.75rem;" ' +
-            'onclick="supprimer(\'' + p.cleUnique + '\')">🗑</button></td>' +
-      '</tr>';
-    }).join('');
+    tbody.innerHTML = presencesAfichees.map((p, i) => `
+      <tr>
+        <td><strong>${i + 1}</strong></td>
+        <td><code>${p.matricule || '—'}</code></td>
+        <td><strong>${p.nom || '—'}</strong></td>
+        <td>${p.postnom || '—'}</td>
+        <td>${p.prenoms || '—'}</td>
+        <td><span class="badge">${p.promotion || '—'}</span></td>
+        <td>${p.matiere || '—'}</td>
+        <td>${p.date || '—'}</td>
+        <td>${p.heure || '—'}</td>
+        <td><button class="btn-del" onclick="supprimerPresence('${p.id}')" title="Supprimer">🗑</button></td>
+      </tr>
+    `).join('');
   }
 
-  // Supprimer une présence
-  function supprimer(cleUnique) {
+  // ---- Statistiques ----
+  function mettreAJourStats() {
+    document.getElementById('total-count').textContent = toutesLesPresences.length;
+
+    const countAujourdhui = toutesLesPresences.filter(p => p.date === aujourd_hui).length;
+    document.getElementById('today-count').textContent = countAujourdhui;
+
+    const promotions = new Set(toutesLesPresences.map(p => p.promotion).filter(Boolean));
+    document.getElementById('promo-count').textContent = promotions.size;
+  }
+
+  // ---- Supprimer une présence ----
+  window.supprimerPresence = async function(id) {
     if (!confirm('Supprimer cette présence ?')) return;
+    await deleteDoc(doc(db, "presences", id));
+  };
 
-    var presences = toutesPresences().filter(function(p) {
-      return p.cleUnique !== cleUnique;
-    });
-
-    localStorage.setItem('presences', JSON.stringify(presences));
-    mettreAJourStats();
-    construireOnglets();
-    remplirFiltreMatiere();
+  // ---- Réinitialiser les filtres ----
+  window.reinitialiser = function() {
+    document.getElementById('filtre-date').value = dateInput;
+    document.getElementById('filtre-matiere').value = '';
+    document.getElementById('filtre-promotion').value = '';
+    document.getElementById('filtre-recherche').value = '';
     afficherTableau();
-  }
+  };
 
-  // Tout effacer
-  function toutEffacer() {
-    if (!confirm('Effacer TOUTES les présences ? Cette action est irréversible.')) return;
-    localStorage.removeItem('presences');
-    mettreAJourStats();
-    construireOnglets();
-    remplirFiltreMatiere();
-    afficherTableau();
-  }
-
-  // Réinitialiser les filtres
-  function reinitialiserFiltres() {
-    var aujourd = new Date().toISOString().split('T')[0];
-    document.getElementById('f-date').value     = aujourd;
-    document.getElementById('f-matiere').value  = '';
-    document.getElementById('f-recherche').value = '';
-    promoActive = '';
-    construireOnglets();
-    afficherTableau();
-  }
-
-  // Exporter en CSV (compatible Excel)
-  function exporterCSV() {
-    var presences = toutesPresences();
-    if (presences.length === 0) { alert('Aucune donnée à exporter.'); return; }
-
-    var entetes = ['Matricule', 'Nom', 'Prénoms', 'Poste', 'Promotion', 'Matière', 'Date', 'Heure'];
-
-    var lignes = presences.map(function(p) {
-      var parts   = p.date.split('-');
-      var dateAff = parts[2] + '/' + parts[1] + '/' + parts[0];
-      return [p.matricule, p.nom, p.prenoms, p.poste, p.promotion,
-              p.matiere, dateAff, p.heure]
-        .map(function(v) { return '"' + (v || '').replace(/"/g, '""') + '"'; })
-        .join(',');
-    });
-
-    var csv  = '\uFEFF' + entetes.join(',') + '\n' + lignes.join('\n');
-    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    var url  = URL.createObjectURL(blob);
-    var a    = document.createElement('a');
-    a.href   = url;
-    a.download = 'presences_' + new Date().toISOString().split('T')[0] + '.csv';
+  // ---- Exporter CSV ----
+  window.exporterCSV = function() {
+    if (presencesAfichees.length === 0) { alert('Aucune donnée à exporter.'); return; }
+    const entete = ['#', 'Matricule', 'Nom', 'Post-nom', 'Prénoms', 'Promotion', 'Matière', 'Date', 'Heure'];
+    const lignes = presencesAfichees.map((p, i) =>
+      [i+1, p.matricule, p.nom, p.postnom, p.prenoms, p.promotion, p.matiere, p.date, p.heure]
+      .map(v => `"${v || ''}"`)
+      .join(',')
+    );
+    const csv = [entete.join(','), ...lignes].join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `presences_${new Date().toLocaleDateString('fr-FR').replace(/\//g,'-')}.csv`;
     a.click();
-    URL.revokeObjectURL(url);
-  }
+  };
+
+  // ---- Tout effacer ----
+  window.toutEffacer = async function() {
+    if (!confirm('⚠️ Supprimer TOUTES les présences ? Cette action est irréversible !')) return;
+    const snap = await getDocs(collection(db, "presences"));
+    const suppressions = snap.docs.map(d => deleteDoc(doc(db, "presences", d.id)));
+    await Promise.all(suppressions);
+    alert('Toutes les présences ont été supprimées.');
+  };
+
+  // ---- Filtres en temps réel ----
+  ['filtre-date', 'filtre-matiere', 'filtre-promotion', 'filtre-recherche'].forEach(id => {
+    document.getElementById(id).addEventListener('input', afficherTableau);
+    document.getElementById(id).addEventListener('change', afficherTableau);
+  });
 </script>
 
 </body>
