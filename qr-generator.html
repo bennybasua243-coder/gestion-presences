@@ -3,214 +3,208 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Générer mon QR Code</title>
+  <title>Générer le QR Code</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f4ff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #1a237e, #0d47a1);
       min-height: 100vh;
-      margin: 0;
+      padding: 30px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
     }
-
-    .boite {
+    .card {
       background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      max-width: 480px;
+      border-radius: 20px;
+      padding: 35px 30px;
+      max-width: 500px;
       width: 100%;
-      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     }
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo .icon { font-size: 50px; }
+    .logo h1 { font-size: 22px; color: #1a237e; font-weight: 700; margin-top: 8px; }
+    .logo p { color: #666; font-size: 14px; margin-top: 6px; line-height: 1.5; }
 
-    h1 {
-      color: #1a3c6e;
-      font-size: 1.4rem;
-      margin-bottom: 8px;
-    }
-
-    p.info {
-      color: #666;
-      font-size: 0.9rem;
-      margin-bottom: 24px;
-    }
-
-    label {
-      display: block;
-      text-align: left;
-      font-size: 0.85rem;
-      font-weight: bold;
-      color: #1a3c6e;
-      margin-bottom: 5px;
-      margin-top: 14px;
-    }
-
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; }
     input, select {
       width: 100%;
-      padding: 10px 12px;
-      border: 2px solid #ddd;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      box-sizing: border-box;
-    }
-
-    input:focus, select:focus {
+      padding: 11px 14px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 14px;
       outline: none;
-      border-color: #1a3c6e;
+      background: #fafafa;
+      transition: border-color 0.2s;
     }
+    input:focus, select:focus { border-color: #1a237e; background: white; }
 
-    button {
-      margin-top: 20px;
+    .btn-generate {
       width: 100%;
-      padding: 12px;
-      background: #1a3c6e;
+      padding: 14px;
+      background: linear-gradient(135deg, #1a237e, #0d47a1);
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: bold;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
     }
+    .btn-generate:hover { opacity: 0.9; }
 
-    button:hover {
-      background: #0d2145;
-    }
-
-    #zone-qr {
-      display: none;
-      margin-top: 30px;
-    }
-
-    #zone-qr h2 {
-      color: #1a3c6e;
-      font-size: 1.1rem;
-      margin-bottom: 12px;
-    }
-
-    #qr-image {
-      display: flex;
-      justify-content: center;
-      margin: 16px 0;
-    }
-
-    .info-classe {
-      background: #eef2ff;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 0.88rem;
-      color: #333;
-      margin-bottom: 12px;
-      text-align: left;
-    }
-
-    .btn-imprimer {
-      background: #c9a84c;
-      margin-top: 10px;
-    }
-
-    .btn-imprimer:hover {
-      background: #a8893a;
-    }
-
-    .avertissement {
+    /* Résultat QR */
+    .result { display: none; margin-top: 28px; text-align: center; }
+    .result.visible { display: block; }
+    .result-banner {
       background: #fff8e1;
-      border-left: 4px solid #c9a84c;
+      border-left: 4px solid #f9a825;
       padding: 10px 14px;
-      border-radius: 0 8px 8px 0;
-      font-size: 0.82rem;
-      color: #555;
+      border-radius: 6px;
+      font-size: 13px;
+      color: #795548;
+      margin-bottom: 20px;
       text-align: left;
-      margin-top: 16px;
+    }
+    #qr-container {
+      display: inline-block;
+      padding: 16px;
+      background: white;
+      border: 3px solid #1a237e;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(26,35,126,0.15);
+    }
+    .qr-label {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #555;
+      font-weight: 600;
+    }
+    .qr-sublabel { font-size: 12px; color: #888; margin-top: 3px; }
+
+    .btn-print {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 18px;
+      transition: opacity 0.2s;
+    }
+    .btn-print:hover { opacity: 0.9; }
+
+    .url-box {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 11px;
+      color: #777;
+      word-break: break-all;
+      margin-top: 14px;
+      text-align: left;
+    }
+
+    @media print {
+      body { background: white; padding: 0; }
+      .card { box-shadow: none; border-radius: 0; max-width: 100%; }
+      .btn-generate, .btn-print, .form-group, .logo p, .url-box, .result-banner { display: none !important; }
+      .result { display: block !important; }
     }
   </style>
 </head>
 <body>
+<div class="card">
+  <div class="logo">
+    <div class="icon">📷</div>
+    <h1>Générer le QR Code de ma classe</h1>
+    <p>Ce QR code sera scanné par vos étudiants à chaque cours.<br/>Vous n'avez besoin de le générer <strong>qu'une seule fois</strong> par matière.</p>
+  </div>
 
-<div class="boite">
-  <h1>📷 Générer le QR Code de ma classe</h1>
-  <p class="info">
-    Ce QR code sera scanné par vos étudiants à chaque cours.
-    Vous n'avez besoin de le générer <strong>qu'une seule fois</strong>.
-  </p>
+  <div class="form-group">
+    <label>URL de votre formulaire.html en ligne</label>
+    <input type="url" id="url-formulaire" placeholder="https://votre-compte.github.io/gestion-presences/formulaire.html"/>
+  </div>
 
-  <!-- Champ : URL du formulaire -->
-  <label for="url-formulaire">Adresse (URL) de votre formulaire.html en ligne</label>
-  <input type="text" id="url-formulaire"
-         placeholder="https://votre-site.github.io/formulaire.html"/>
+  <div class="form-group">
+    <label>Matière</label>
+    <input type="text" id="matiere" placeholder="Ex: Mathématiques, Informatique..."/>
+  </div>
 
-  <!-- Champ : Nom de la classe -->
-  <label for="nom-classe">Nom de la classe / promotion</label>
-  <input type="text" id="nom-classe" placeholder="Ex: Licence 1, BTS2, M1..."/>
+  <div class="form-group">
+    <label>Promotion / Classe</label>
+    <select id="promotion">
+      <option value="">— Choisir (optionnel) —</option>
+      <option>Licence 1 (L1)</option>
+      <option>Licence 2 (L2)</option>
+      <option>Licence 3 (L3)</option>
+      <option>Master 1 (M1)</option>
+      <option>Master 2 (M2)</option>
+      <option>BTS 1ère année</option>
+      <option>BTS 2ème année</option>
+      <option>DUT 1ère année</option>
+      <option>DUT 2ème année</option>
+    </select>
+  </div>
 
-  <!-- Champ : Matière -->
-  <label for="nom-matiere">Matière</label>
-  <input type="text" id="nom-matiere" placeholder="Ex: Algorithmique, Réseaux..."/>
+  <button class="btn-generate" onclick="genererQR()">📷 Générer le QR Code</button>
 
-  <button onclick="generer()">📷 Générer le QR Code</button>
-
-  <!-- Zone affichage QR -->
-  <div id="zone-qr">
-    <h2>✅ Votre QR Code est prêt !</h2>
-
-    <div class="info-classe" id="infos-affichees"></div>
-
-    <!-- Le QR code apparaît ici -->
-    <div id="qr-image"></div>
-
-    <div class="avertissement">
-      ⚠️ <strong>Important :</strong> Imprimez ce QR code et affichez-le en classe.
-      Les étudiants le scannent à chaque cours — la date change automatiquement.
+  <!-- Résultat -->
+  <div class="result" id="result">
+    <div class="result-banner">
+      ⚠️ <strong>Important :</strong> Imprimez ce QR code et affichez-le en classe. Les étudiants le scannent à chaque cours — la date change automatiquement.
     </div>
-
-    <button class="btn-imprimer" onclick="imprimer()">🖨️ Imprimer le QR Code</button>
+    <div id="qr-container"></div>
+    <div class="qr-label" id="qr-label"></div>
+    <div class="qr-sublabel" id="qr-sublabel"></div>
+    <div class="url-box" id="qr-url"></div>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimer le QR Code</button>
   </div>
 </div>
 
 <script>
-  function generer() {
-    // Récupérer les valeurs saisies
-    var url     = document.getElementById('url-formulaire').value.trim();
-    var classe  = document.getElementById('nom-classe').value.trim();
-    var matiere = document.getElementById('nom-matiere').value.trim();
+  function genererQR() {
+    const urlBase = document.getElementById('url-formulaire').value.trim();
+    const matiere = document.getElementById('matiere').value.trim();
+    const promotion = document.getElementById('promotion').value;
 
-    // Vérifications simples
-    if (!url)     { alert('Veuillez entrer l\'URL du formulaire.'); return; }
-    if (!classe)  { alert('Veuillez entrer le nom de la classe.'); return; }
+    if (!urlBase) { alert('Veuillez entrer l\'URL de votre formulaire.'); return; }
     if (!matiere) { alert('Veuillez entrer le nom de la matière.'); return; }
 
-    // Construire l'URL complète avec les paramètres
-    // Ces paramètres seront lus automatiquement par formulaire.html
-    var urlComplete = url
-      + '?classe='  + encodeURIComponent(classe)
-      + '&matiere=' + encodeURIComponent(matiere);
+    // Construire l'URL avec les paramètres
+    const params = new URLSearchParams();
+    if (matiere) params.set('matiere', matiere);
+    if (promotion) params.set('promotion', promotion);
+    const urlFinale = urlBase + '?' + params.toString();
 
-    // Vider et régénérer le QR code
-    document.getElementById('qr-image').innerHTML = '';
+    // Vider et regénérer le QR
+    const container = document.getElementById('qr-container');
+    container.innerHTML = '';
 
-    new QRCode(document.getElementById('qr-image'), {
-      text:         urlComplete,
-      width:        200,
-      height:       200,
+    new QRCode(container, {
+      text: urlFinale,
+      width: 220,
+      height: 220,
+      colorDark: "#1a237e",
+      colorLight: "#ffffff",
       correctLevel: QRCode.CorrectLevel.H
     });
 
-    // Afficher les infos de la classe
-    document.getElementById('infos-affichees').innerHTML =
-      '🎓 Classe : <strong>' + classe + '</strong><br/>' +
-      '📚 Matière : <strong>' + matiere + '</strong><br/>' +
-      '🔗 URL : <small>' + urlComplete + '</small>';
-
-    // Afficher la zone QR
-    document.getElementById('zone-qr').style.display = 'block';
-  }
-
-  function imprimer() {
-    window.print();
+    document.getElementById('qr-label').textContent = '📚 ' + matiere + (promotion ? ' · ' + promotion : '');
+    document.getElementById('qr-sublabel').textContent = 'Scannez avec votre téléphone';
+    document.getElementById('qr-url').textContent = '🔗 ' + urlFinale;
+    document.getElementById('result').classList.add('visible');
   }
 </script>
-
 </body>
 </html>
+
